@@ -157,9 +157,11 @@ if __name__ == "__main__":
                 _points, _shift_points, _cluster = train_mean_shift(data[start:i + 1], 2)
                 points = np.row_stack((points, _points))
                 shift_points = np.row_stack((shift_points, _shift_points))
-                cluster = np.row_stack((cluster, _cluster))
+                cluster.extend(_cluster)
             start = i + 1
-
-    for i in range(len(cluster)):
+    fout = open('res.txt','w')
+    for i in range(len(label)):
+        fout.write(label[0]+'\t'+label[1]+'\t'+label[2]+'\t'+data[0]+'\t'+data[1]+'\t'+cluster[i]+'\n')
         print("%5.2f,%5.2f\t%5.2f,%5.2f\t%i" % (
             points[i, 0], points[i, 1], shift_points[i, 0], shift_points[i, 1], cluster[i]))
+    fout.close()

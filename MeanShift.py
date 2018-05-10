@@ -2,7 +2,7 @@ import math
 import sys
 import numpy as np
 
-MIN_DISTANCE = 0.000001  # mini error
+MIN_DISTANCE = 0.0001  # mini error
 
 
 def load_data(path, label_num=3, feature_num=2):
@@ -43,8 +43,8 @@ def shift_point(point, points, kernel_bandwidth):
     # 计算距离
     point_distances = np.mat(np.zeros((m, 1)))
     for i in range(m):
-        point_distances[i, 0] = np.sqrt((point - points[i]) * (point - points[i]).T)
-        #point_distances[i, 0] = geograph_dist(point, points[i])
+        #point_distances[i, 0] = np.sqrt((point - points[i]) * (point - points[i]).T)
+        point_distances[i, 0] = geograph_dist(point, points[i])
 
     # 计算高斯核
     point_weights = gaussian_kernel(point_distances, kernel_bandwidth)
@@ -86,7 +86,7 @@ def group_points(mean_shift_points):
     for i in range(m):
         item = []
         for j in range(n):
-            item.append(str(("%5.2f" % mean_shift_points[i, j])))
+            item.append(str(mean_shift_points[i, j]))
 
         item_1 = "_".join(item)
         print(item_1)
@@ -97,10 +97,10 @@ def group_points(mean_shift_points):
     for i in range(m):
         item = []
         for j in range(n):
-            item.append(str(("%5.2f" % mean_shift_points[i, j])))
+            item.append(str(mean_shift_points[i, j]))
 
         item_1 = "_".join(item)
-    group_assignment.append(index_dict[item_1])
+        group_assignment.append(index_dict[item_1])
     return group_assignment
 
 
@@ -161,7 +161,7 @@ if __name__ == "__main__":
             start = i + 1
     fout = open('res.txt','w')
     for i in range(len(label)):
-        fout.write(label[0]+'\t'+label[1]+'\t'+label[2]+'\t'+data[0]+'\t'+data[1]+'\t'+cluster[i]+'\n')
+        fout.write(label[i][0]+'\t'+label[i][1]+'\t'+label[i][2]+'\t'+str(data[i][0])+'\t'+str(data[i][1])+'\t'+str(cluster[i])+'\n')
         print("%5.2f,%5.2f\t%5.2f,%5.2f\t%i" % (
             points[i, 0], points[i, 1], shift_points[i, 0], shift_points[i, 1], cluster[i]))
     fout.close()

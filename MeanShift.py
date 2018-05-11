@@ -2,7 +2,7 @@ import math
 import sys
 import numpy as np
 
-MIN_DISTANCE = 0.0001  # mini error
+MIN_DISTANCE = 1  # mini error
 index = 0
 
 def load_data(path, label_num=3, feature_num=2):
@@ -107,7 +107,7 @@ def group_points(mean_shift_points):
 def train_mean_shift(points, kenel_bandwidth=2):
     # shift_points = np.array(points)
     mean_shift_points = np.mat(points)
-    max_min_dist = 1
+    max_min_dist = 10
     iter = 0
     m, n = np.shape(mean_shift_points)
     need_shift = [True] * m
@@ -151,10 +151,10 @@ if __name__ == "__main__":
         if i + 1 ==len(label)  or label[i][1] != label[i + 1][1]:
             # 训练，h=2
             if first:
-                points, shift_points, cluster = train_mean_shift(data[start:i + 1], 1000)
+                points, shift_points, cluster = train_mean_shift(data[start:i + 1], 100)
                 first = False
             else:
-                _points, _shift_points, _cluster = train_mean_shift(data[start:i + 1], 1000)
+                _points, _shift_points, _cluster = train_mean_shift(data[start:i + 1], 100)
                 points = np.row_stack((points, _points))
                 shift_points = np.row_stack((shift_points, _shift_points))
                 cluster.extend(_cluster)

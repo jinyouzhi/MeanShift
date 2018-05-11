@@ -3,7 +3,7 @@ import sys
 import numpy as np
 
 MIN_DISTANCE = 0.0001  # mini error
-
+index = 0
 
 def load_data(path, label_num=3, feature_num=2):
     f = open(path)
@@ -79,9 +79,9 @@ def distance_to_group(point, group):
 
 
 def group_points(mean_shift_points):
+    global index
     group_assignment = []
     m, n = np.shape(mean_shift_points)
-    index = 0
     index_dict = {}
     for i in range(m):
         item = []
@@ -151,10 +151,10 @@ if __name__ == "__main__":
         if i + 1 ==len(label)  or label[i][1] != label[i + 1][1]:
             # 训练，h=2
             if first:
-                points, shift_points, cluster = train_mean_shift(data[start:i + 1], 2)
+                points, shift_points, cluster = train_mean_shift(data[start:i + 1], 1000)
                 first = False
             else:
-                _points, _shift_points, _cluster = train_mean_shift(data[start:i + 1], 2)
+                _points, _shift_points, _cluster = train_mean_shift(data[start:i + 1], 1000)
                 points = np.row_stack((points, _points))
                 shift_points = np.row_stack((shift_points, _shift_points))
                 cluster.extend(_cluster)

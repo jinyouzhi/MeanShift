@@ -2,8 +2,9 @@ import math
 import sys
 import numpy as np
 
-MIN_DISTANCE = 1  # mini error
+MIN_DISTANCE = 0.000001  # mini error
 index = 0
+
 
 def load_data(path, label_num=3, feature_num=2):
     f = open(path)
@@ -43,7 +44,7 @@ def shift_point(point, points, kernel_bandwidth):
     # 计算距离
     point_distances = np.mat(np.zeros((m, 1)))
     for i in range(m):
-        #point_distances[i, 0] = np.sqrt((point - points[i]) * (point - points[i]).T)
+        # point_distances[i, 0] = np.sqrt((point - points[i]) * (point - points[i]).T)
         point_distances[i, 0] = geograph_dist(point, points[i])
 
     # 计算高斯核
@@ -64,10 +65,12 @@ def euclidean_dist(pointA, pointB):
     total = (pointA - pointB) * (pointA - pointB).T
     return math.sqrt(total)
 
+
 def geograph_dist(pointA, pointB):
     # 计算pointA和pointB之间的地理距离（vincenty法）
     from geopy.distance import vincenty
     return vincenty(pointA.tolist(), pointB.tolist()).meters
+
 
 def distance_to_group(point, group):
     min_distance = 100000.0
@@ -107,7 +110,7 @@ def group_points(mean_shift_points):
 def train_mean_shift(points, kenel_bandwidth=2):
     # shift_points = np.array(points)
     mean_shift_points = np.mat(points)
-    max_min_dist = 10
+    max_min_dist = 100
     iter = 0
     m, n = np.shape(mean_shift_points)
     need_shift = [True] * m
@@ -148,20 +151,29 @@ if __name__ == "__main__":
     for i in range(len(label)):
         if i % 100 == 0:
             print(i)
-        if i + 1 ==len(label)  or label[i][1] != label[i + 1][1]:
+        if i + 1 == len(label) or label[i][1] != label[i + 1][1]:
             # 训练，h=2
+            epoch = 0
+            last = 0
             if first:
-                points, shift_points, cluster = train_mean_shift(data[start:i + 1], 100)
+                points, shift_points, cluster = train_mean_shift(data[start:i + 1], 1000)
+                epoch = epoch + 1
+                print("epoch:" + str(epoch) + '\t' + str(index - last))
+                last = index
                 first = False
             else:
-                _points, _shift_points, _cluster = train_mean_shift(data[start:i + 1], 100)
+                _points, _shift_points, _cluster = train_mean_shift(data[start:i + 1], 1000)
+                epoch = epoch + 1
+                print("epoch:" + str(epoch) + '\t' + str(index - last))
+                last = index
                 points = np.row_stack((points, _points))
                 shift_points = np.row_stack((shift_points, _shift_points))
                 cluster.extend(_cluster)
             start = i + 1
-    fout = open('res.txt','w')
+    fout = open('res.txt', 'w')
     for i in range(len(label)):
-        fout.write(label[i][0]+'\t'+label[i][1]+'\t'+label[i][2]+'\t'+str(data[i][0])+'\t'+str(data[i][1])+'\t'+str(cluster[i])+'\n')
+        fout.write(label[i][0] + '\t' + label[i][1] + '\t' + label[i][2] + '\t' + str(data[i][0]) + '\t' + str(
+            data[i][1]) + '\t' + str(cluster[i]) + '\n')
         print("%5.2f,%5.2f\t%5.2f,%5.2f\t%i" % (
             points[i, 0], points[i, 1], shift_points[i, 0], shift_points[i, 1], cluster[i]))
     fout.close()
